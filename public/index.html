@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⬆️ File Sharing</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <h2>Upload de Arquivo</h2>
+
+        <!-- FORMS -->
+        <form id="uploadForm" enctype="multipart/form-data">
+            <label for="fileInput" class="upload-label">Escolher Arquivo</label>
+            <input type="file" name="fileInput" id="fileInput" required>
+            <span id="selectedFileName" class="selected-file-name"></span>
+            <button type="button" class="upload-button" onclick="uploadFile()">Enviar Arquivo</button>
+        </form>
+
+        <!-- PROGRESS BAR -->
+        <div class="progress-wrapper">
+            <progress id="uploadProgress" value="0" max="100" class="progress-bar"></progress>
+        </div>
+
+        <!-- MY UPLOADED FILES -->
+        <button type="button" class="file-list-button" onclick="location.href = './myFiles';">Meus Arquivos Enviados</button>
+    </div>
+
+    <!-- UPLOADER JAVASCRIPT -->
+    <script>
+        document.getElementById('fileInput').addEventListener('change', function () {
+            var fileName = this.files[0].name;
+            document.getElementById('selectedFileName').textContent = fileName;
+        });
+
+        function uploadFile() {
+            var form = document.getElementById('uploadForm');
+            var formData = new FormData(form);
+            var xhr = new XMLHttpRequest();
+
+            // Configura a barra de progresso
+            var progress = document.getElementById('uploadProgress');
+            xhr.upload.onprogress = function (e) {
+                if (e.lengthComputable) {
+                    var percentComplete = (e.loaded / e.total) * 100;
+                    progress.value = percentComplete;
+                }
+            };
+
+            xhr.onload = function () {
+                if (xhr.status == 200) {
+                    alert("✅ Upload completo!");
+                    progress.value = 0;
+                    document.getElementById('selectedFileName').textContent = ''; // Clear selected file name
+                } else {
+                    alert("🚨 Erro no upload: " + xhr.status);
+                }
+            };
+
+            xhr.open('POST', '/upload', true);
+            xhr.send(formData);
+        }
+    </script>
+</body>
+
+</html>
